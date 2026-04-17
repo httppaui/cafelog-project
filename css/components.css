@@ -111,7 +111,7 @@
 }
 
 .entry-drink {
-  font-family: 'Lora', serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-style: italic;
   font-size: 13px;
   color: var(--caramel);
@@ -125,7 +125,7 @@
 .star.empty  { color: var(--mist); }
 
 .entry-note {
-  font-family: 'Lora', serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-size: 13px;
   color: var(--bark);
   line-height: 1.6;
@@ -279,7 +279,7 @@
 textarea.form-input {
   min-height: 110px;
   resize: vertical;
-  font-family: 'Lora', serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-style: italic;
   line-height: 1.7;
   font-size: 14px;
@@ -565,7 +565,7 @@ textarea.form-input {
   border: 1.5px solid var(--mist);
   border-radius: var(--radius-lg);
   padding: 20px;
-  font-family: 'Lora', serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-style: italic;
   font-size: 15px;
   color: var(--ink);
@@ -718,7 +718,7 @@ textarea.form-input {
 }
 
 .cal-day {
-  aspect-ratio: 1;
+  height: 52px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -750,14 +750,14 @@ textarea.form-input {
   margin-bottom: 4px;
 }
 .detail-drink {
-  font-family: 'Lora', serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-style: italic;
   font-size: 15px;
   color: var(--caramel);
   margin-bottom: 14px;
 }
 .detail-note {
-  font-family: 'Lora', serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-style: italic;
   font-size: 14px;
   line-height: 1.8;
