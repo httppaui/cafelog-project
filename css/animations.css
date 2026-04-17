@@ -1,0 +1,102 @@
+/* animations.css — keyframes and transitions */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ── Page entrance ── */
+.page-enter {
+  animation: slideUp 0.3s ease both;
+}
+
+/* ── Card stagger ── */
+.entry-card { animation: slideUp 0.3s ease both; }
+.entry-card:nth-child(1) { animation-delay: 0.04s; }
+.entry-card:nth-child(2) { animation-delay: 0.08s; }
+.entry-card:nth-child(3) { animation-delay: 0.12s; }
+.entry-card:nth-child(4) { animation-delay: 0.16s; }
+.entry-card:nth-child(5) { animation-delay: 0.20s; }
+.entry-card:nth-child(6) { animation-delay: 0.24s; }
+
+/* ── Skeleton loader ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--foam) 25%, var(--mist) 50%, var(--foam) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Streak badge pulse ── */
+.streak-number { animation: none; }
+.streak-badge:hover .streak-number {
+  animation: pulse 1s ease infinite;
+}
+
+/* ── Mood chip hover ── */
+.mood-chip,
+.mood-selector-btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+/* ── AI loading dots ── */
+.loading-dots span {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--latte);
+  margin: 0 2px;
+  animation: pulse 1.2s ease infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Toast notification ── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--espresso);
+  color: var(--foam);
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 9999;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── Nav item active indicator ── */
+.nav-item.active {
+  position: relative;
+}

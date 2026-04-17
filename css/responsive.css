@@ -1,0 +1,120 @@
+/* responsive.css — mobile-first responsive design */
+
+/* ── Tablet (≤ 1024px) ── */
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 210px; }
+
+  .topbar { padding: 0 24px; gap: 10px; }
+  .page-content { padding: 24px 24px 48px; }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .search-bar { width: 190px; }
+
+  .ai-recs { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Mobile (≤ 768px) ── */
+@media (max-width: 768px) {
+
+  /* Show mobile topbar */
+  .mobile-topbar { display: flex; }
+
+  /* Sidebar becomes drawer */
+  .sidebar {
+    transform: translateX(-100%);
+    top: 0;
+    box-shadow: none;
+    z-index: 400;
+  }
+
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-xl); }
+  .sidebar.open .sidebar-overlay { display: block; }
+
+  /* Main fills full width */
+  .main {
+    margin-left: 0;
+    padding-top: 56px; /* mobile topbar height */
+  }
+
+  /* Topbar becomes compact */
+  .topbar {
+    padding: 0 16px;
+    height: 56px;
+    gap: 8px;
+  }
+
+  .page-title { font-size: 18px; }
+
+  .search-bar { display: none; }
+
+  .view-toggle { display: none; }
+
+  .new-entry-btn span:first-child { margin-right: 2px; }
+  .new-entry-btn { padding: 9px 14px; font-size: 13px; }
+
+  /* Page content */
+  .page-content { padding: 18px 16px 60px; }
+
+  /* Stats — 2 col */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-number { font-size: 26px; }
+  .stat-icon   { font-size: 22px; }
+
+  /* Entries full width */
+  .entries-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Form rows collapse */
+  .form-row { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Modal */
+  .modal { padding: 24px 18px; border-radius: 20px; max-height: 95vh; }
+  .modal-title { font-size: 22px; }
+
+  /* Calendar grid smaller */
+  .cal-day { font-size: 12px; border-radius: 7px; }
+  .calendar-wrapper { padding: 16px; }
+
+  /* Timeline */
+  .timeline { padding-left: 22px; }
+
+  /* AI panel */
+  .ai-panel { padding: 22px; }
+  .ai-recs  { grid-template-columns: 1fr; }
+
+  /* Sensory grid */
+  .sensory-grid { grid-template-columns: 1fr; }
+
+  /* Mood selector */
+  .mood-selector-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Coffee suggestions */
+  .coffee-suggestions-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Wishlist */
+  .wishlist-add-row { flex-direction: column; }
+  .wishlist-add-btn { width: 100%; }
+
+  /* Notepad */
+  .notepad-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── Small Mobile (≤ 400px) ── */
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { padding: 14px 12px; }
+  .stat-number { font-size: 22px; }
+
+  .coffee-suggestions-grid { grid-template-columns: 1fr; }
+
+  .mood-selector-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .entry-card.list-mode .entry-photo-placeholder { width: 64px; height: 64px; font-size: 22px; }
+}
+
+/* ── Large screens (≥ 1280px) ── */
+@media (min-width: 1280px) {
+  .entries-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .stats-grid   { grid-template-columns: repeat(4, 1fr); }
+  .ai-recs      { grid-template-columns: repeat(4, 1fr); }
+}

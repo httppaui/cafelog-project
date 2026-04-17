@@ -1,0 +1,62 @@
+/* variables.css — design tokens */
+:root {
+  /* Core Palette */
+  --cream:    #FDF6EC;
+  --foam:     #F5E6D3;
+  --mist:     #EDE0D0;
+  --latte:    #C8A882;
+  --caramel:  #D4955A;
+  --gold:     #C9935A;
+  --bark:     #8B5E3C;
+  --mocha:    #6B3A2A;
+  --espresso: #3D1F0D;
+  --ink:      #2C1810;
+  --blush:    #E8C4B0;
+  --sage:     #8A9A7B;
+
+  /* Mood Colors */
+  --mood-cozy-bg:       #FCE7F3;
+  --mood-cozy-text:     #9D174D;
+  --mood-energized-bg:  #D1FAE5;
+  --mood-energized-text:#065F46;
+  --mood-reflective-bg: #EDE9FE;
+  --mood-reflective-text:#4C1D95;
+  --mood-social-bg:     #FEE2E2;
+  --mood-social-text:   #991B1B;
+  --mood-peaceful-bg:   #E0F2FE;
+  --mood-peaceful-text: #075985;
+  --mood-curious-bg:    #FEF3C7;
+  --mood-curious-text:  #92400E;
+
+  /* Spacing */
+  --gap-xs:  4px;
+  --gap-sm:  8px;
+  --gap-md:  16px;
+  --gap-lg:  24px;
+  --gap-xl:  32px;
+  --gap-2xl: 48px;
+
+  /* Border Radius */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(61,31,13,0.06);
+  --shadow-md:  0 8px 24px rgba(61,31,13,0.10);
+  --shadow-lg:  0 20px 48px rgba(61,31,13,0.14);
+  --shadow-xl:  0 32px 64px rgba(61,31,13,0.18);
+
+  /* Sidebar */
+  --sidebar-width: 240px;
+
+  /* Transitions */
+  --trans-fast:   0.15s ease;
+  --trans-normal: 0.25s ease;
+  --trans-slow:   0.4s ease;
+
+  /* Topbar */
+  --topbar-height: 68px;
+}

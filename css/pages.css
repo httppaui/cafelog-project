@@ -1,0 +1,305 @@
+/* pages.css — page-specific styles */
+
+/* ── AI Panel ── */
+.ai-panel {
+  background: linear-gradient(135deg, var(--espresso) 0%, var(--mocha) 100%);
+  border-radius: var(--radius-xl);
+  padding: 30px;
+  color: var(--foam);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--gap-xl);
+}
+
+.ai-panel::before {
+  content: '☕';
+  position: absolute;
+  right: 20px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 110px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.ai-panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--latte);
+  margin-bottom: 4px;
+}
+
+.ai-panel-subtitle { font-size: 13px; opacity: 0.65; margin-bottom: 18px; }
+
+.ai-recs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ai-generate-btn {
+  background: var(--caramel);
+  color: white;
+  border: none;
+  padding: 11px 22px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all var(--trans-fast);
+}
+
+.ai-generate-btn:hover { background: var(--gold); transform: translateY(-1px); }
+.ai-generate-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* ── Sensory Panel ── */
+.sensory-header-card {
+  background: linear-gradient(135deg, var(--cream), var(--foam));
+  border: 1px solid var(--mist);
+  border-radius: var(--radius-xl);
+  padding: 26px;
+  margin-bottom: var(--gap-xl);
+}
+
+.sensory-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--espresso);
+  margin-bottom: 6px;
+}
+
+.sensory-header-sub { font-size: 13px; color: var(--bark); line-height: 1.6; max-width: 580px; }
+
+.sensory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--gap-lg);
+}
+
+.sensory-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  border: 1px solid var(--mist);
+}
+
+.sensory-card-cafe {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--espresso);
+  margin-bottom: 2px;
+}
+
+.sensory-card-drink {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--caramel);
+  margin-bottom: 16px;
+}
+
+.flavor-display-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.flavor-display-label {
+  width: 70px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bark);
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.flavor-display-val {
+  width: 28px;
+  font-size: 11px;
+  color: var(--bark);
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+/* ── Mood Coffee Page ── */
+.mood-hero {
+  background: linear-gradient(135deg, #FDF6EC, #F5E6D3);
+  border-radius: var(--radius-xl);
+  padding: 30px;
+  margin-bottom: var(--gap-xl);
+  border: 1px solid var(--mist);
+}
+
+.mood-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-style: italic;
+  color: var(--espresso);
+  margin-bottom: 6px;
+}
+
+.mood-hero-sub { font-size: 14px; color: var(--bark); margin-bottom: 22px; }
+
+.mood-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .mood-selector-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.mood-selector-btn {
+  padding: 14px 10px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--trans-normal);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mood-selector-btn:hover { transform: scale(1.04); }
+.mood-selector-btn.selected { border-color: var(--espresso); transform: scale(1.04); box-shadow: var(--shadow-md); }
+
+.mood-selector-emoji { font-size: 28px; display: block; margin-bottom: 4px; }
+
+.mood-result {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  border: 1px solid var(--mist);
+  animation: fadeIn 0.4s ease;
+}
+
+.mood-result-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--espresso);
+  margin-bottom: 6px;
+}
+
+.mood-result-sub { font-size: 13px; color: var(--bark); margin-bottom: 20px; }
+
+.coffee-suggestions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.coffee-suggestion-card {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  cursor: default;
+  transition: transform var(--trans-normal);
+}
+
+.coffee-suggestion-card:hover { transform: translateY(-3px); }
+
+.suggestion-drink-emoji { font-size: 36px; margin-bottom: 8px; }
+.suggestion-drink-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--espresso);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.suggestion-reason { font-size: 12px; color: var(--bark); line-height: 1.5; }
+
+/* ── Notepad ── */
+.notepad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.notepad-save-indicator {
+  font-size: 12px;
+  color: var(--sage);
+  font-style: italic;
+  opacity: 0;
+  transition: opacity var(--trans-normal);
+}
+
+.notepad-save-indicator.visible { opacity: 1; }
+
+/* ── Wishlist Page ── */
+.wishlist-add-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.wishlist-add-input {
+  flex: 1;
+  padding: 11px 16px;
+  background: white;
+  border: 1.5px solid var(--mist);
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color var(--trans-fast);
+}
+
+.wishlist-add-input:focus { border-color: var(--caramel); }
+.wishlist-add-input::placeholder { color: var(--latte); }
+
+.wishlist-add-btn {
+  background: var(--espresso);
+  color: var(--foam);
+  border: none;
+  padding: 11px 20px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all var(--trans-fast);
+  white-space: nowrap;
+}
+
+.wishlist-add-btn:hover { background: var(--mocha); }
+
+.wishlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wishlist-location {
+  font-size: 12px;
+  color: var(--latte);
+}
+
+/* ── Cafe Visits section on Calendar ── */
+.month-visits {
+  margin-top: 28px;
+}
+
+.top-cafe-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mist);
+}
+
+.top-cafe-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  color: var(--espresso);
+}
+
+.top-cafe-meta { font-size: 12px; color: var(--bark); }
