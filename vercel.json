@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "coffee-diary",
+  "name": "cafelog",
   "builds": [
     {
       "src": "index.html",

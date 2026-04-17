@@ -3,7 +3,7 @@
 function renderPage(page) {
   const container = document.getElementById("pageContent");
   const titles = {
-    journal:  "My Coffee Diary",
+    journal:  "cafélog",
     calendar: "Calendar View",
     timeline: "My Timeline",
     mood:     "Mood & Coffee",
@@ -13,7 +13,7 @@ function renderPage(page) {
     notepad:  "My Notepad",
   };
 
-  document.getElementById("pageTitle").textContent = titles[page] || "The Coffee Diary";
+  document.getElementById("pageTitle").textContent = titles[page] || "cafélog";
 
   // Show/hide topbar controls based on page
   const searchBar  = document.getElementById("searchBarWrapper");
