@@ -129,10 +129,14 @@
   font-size: 13px;
   color: var(--bark);
   line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: -webkit-box;        /* still needed for Safari */
+  -webkit-line-clamp: 2;       /* still needed — no standard equivalent yet */
+  -webkit-box-orient: vertical; /* still needed */
   overflow: hidden;
+
+  /* Modern standard (limited support still) */
+  display: block;
+  line-clamp: 2;
 }
 
 .entry-footer {
@@ -392,6 +396,7 @@ textarea.form-input {
 .flavor-range {
   flex: 1;
   -webkit-appearance: none;
+  appearance: none;
   height: 6px;
   border-radius: 3px;
   background: var(--mist);
