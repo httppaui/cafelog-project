@@ -30,7 +30,6 @@ function renderEntryCard(entry, listMode = false) {
 
 function renderDetailModal(entry) {
   const emoji = getDrinkEmoji(entry.drink);
-  const moodCfg = entry.mood ? MOOD_CONFIG[entry.mood] : null;
   const hasFlavors = entry.flavors && Object.keys(entry.flavors).length > 0;
 
   return `
@@ -51,8 +50,12 @@ function renderDetailModal(entry) {
         <div class="section-label" style="font-size:15px;margin-bottom:12px;">Flavor Profile</div>
         ${renderFlavorBars(entry.flavors)}
       </div>` : ""}
-    <div style="margin-top:20px;display:flex;gap:10px;">
-      <button class="submit-btn" style="background:var(--mist);color:var(--espresso);font-family:'DM Sans',sans-serif;font-style:normal;font-size:14px;font-weight:600;" 
+    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="submit-btn" id="editEntryBtn"
+        style="background:var(--caramel);color:white;font-family:'DM Sans',sans-serif;font-style:normal;font-size:14px;font-weight:600;">
+        ✏️ Edit Entry
+      </button>
+      <button class="submit-btn" style="background:var(--mist);color:var(--espresso);font-family:'DM Sans',sans-serif;font-style:normal;font-size:14px;font-weight:600;"
         onclick="deleteEntryFromDetail(${entry.id})">🗑 Delete Entry</button>
     </div>`;
 }
@@ -68,7 +71,7 @@ function renderStatCards(stats) {
 }
 
 function renderCalendar(month, year, entries) {
-  const days = getDaysInMonth(month, year);
+  const days     = getDaysInMonth(month, year);
   const firstDay = getFirstDayOfMonth(month, year);
 
   const entryDays = new Set(
@@ -83,12 +86,12 @@ function renderCalendar(month, year, entries) {
   const headerCells = DAYS.map(d => `<div class="cal-header">${d}</div>`).join("");
   const emptyCells  = Array(firstDay).fill(`<div class="cal-day empty"></div>`).join("");
   const dayCells    = Array.from({ length: days }, (_, i) => {
-    const day = i + 1;
-    const today     = isToday(day, month, year);
-    const hasEntry  = entryDays.has(day);
-    const classes   = ["cal-day", today ? "today" : "", hasEntry ? "has-entry" : ""].filter(Boolean).join(" ");
-    const dot       = hasEntry ? `<div class="cal-dot"></div>` : "";
-    return `<div class="${classes}" data-day="${day}">${day}${dot}</div>`;
+    const day      = i + 1;
+    const today    = isToday(day, month, year);
+    const hasEntry = entryDays.has(day);
+    const classes  = ["cal-day", today ? "today" : "", hasEntry ? "has-entry" : ""].filter(Boolean).join(" ");
+    const dot      = hasEntry ? `<div class="cal-dot"></div>` : "";
+    return `<div class="${classes}" data-day="${day}" ${hasEntry ? 'role="button" tabindex="0"' : ""}>${day}${dot}</div>`;
   }).join("");
 
   return `

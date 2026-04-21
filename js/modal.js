@@ -2,7 +2,7 @@
 
 /* ── Detail Modal ── */
 function openDetailModal(entry) {
-  const modal = document.getElementById("detailModal");
+  const modal   = document.getElementById("detailModal");
   const content = document.getElementById("detailModalContent");
   content.innerHTML = `
     <button class="modal-close" id="closeDetailModal">✕</button>
@@ -12,6 +12,12 @@ function openDetailModal(entry) {
 
   document.getElementById("closeDetailModal")?.addEventListener("click", closeDetailModal);
   modal.addEventListener("click", e => e.target === modal && closeDetailModal());
+
+  // Edit button
+  document.getElementById("editEntryBtn")?.addEventListener("click", () => {
+    closeDetailModal();
+    openNewEntryModal(entry);
+  });
 }
 
 function closeDetailModal() {
@@ -19,49 +25,102 @@ function closeDetailModal() {
   document.body.style.overflow = "";
 }
 
-/* ── New Entry Modal ── */
-function openNewEntryModal() {
+/* ── New / Edit Entry Modal ── */
+function openNewEntryModal(existingEntry = null) {
   const modal = document.getElementById("newEntryModal");
+  const isEdit = !!existingEntry;
+
   modal.classList.add("open");
   document.body.style.overflow = "hidden";
 
-  // Reset form state
-  State.set("currentRating", 0);
-  State.set("currentMood", "");
-  State.set("currentTags", []);
-  State.set("currentFlavors", {});
-  State.set("currentPhotos", []);
+  // Store editing id
+  State.set("editingEntryId", isEdit ? existingEntry.id : null);
 
-  // Set today's date
+  // Reset or populate state
+  State.set("currentRating",  isEdit ? existingEntry.rating  : 0);
+  State.set("currentMood",    isEdit ? existingEntry.mood    : "");
+  State.set("currentTags",    isEdit ? [...(existingEntry.tags || [])] : []);
+  State.set("currentFlavors", isEdit ? { ...(existingEntry.flavors || {}) } : {});
+  State.set("currentPhotos",  isEdit ? [...(existingEntry.photos || [])] : []);
+
+  // Update modal title
+  document.getElementById("modalTitle").textContent = isEdit ? "Edit Entry ✏️" : "New Entry ☕";
+  document.querySelector(".submit-btn").textContent  = isEdit ? "Save Changes ☕" : "Save to Diary ☕";
+
+  // Set date
   const dateInput = document.getElementById("entryDate");
-  if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
+  if (dateInput) dateInput.value = isEdit
+    ? existingEntry.date
+    : new Date().toISOString().split("T")[0];
+
+  // Populate fields if editing
+  const cafeInput  = document.getElementById("cafeName");
+  const drinkInput = document.getElementById("drinkName");
+  const noteInput  = document.getElementById("entryNote");
+  if (cafeInput)  cafeInput.value  = isEdit ? existingEntry.cafe  : "";
+  if (drinkInput) drinkInput.value = isEdit ? existingEntry.drink : "";
+  if (noteInput)  noteInput.value  = isEdit ? existingEntry.note  : "";
 
   // Reset star buttons
-  document.querySelectorAll(".star-btn").forEach(b => b.classList.remove("active"));
-
-  // Reset mood chips
-  document.querySelectorAll(".mood-chip").forEach(c => c.classList.remove("selected"));
-
-  // Reset tags display
-  renderTagsInForm();
-
-  // Reset flavor sliders to 30
-  document.querySelectorAll(".flavor-range").forEach(r => {
-    r.value = 30;
-    r.nextElementSibling.textContent = 30;
+  document.querySelectorAll(".star-btn").forEach(b => {
+    b.classList.toggle("active", isEdit && parseInt(b.dataset.star) <= existingEntry.rating);
   });
 
-  // Clear photo previews
-  document.getElementById("photoPreviewGrid").innerHTML = "";
+  // Reset mood chips
+  document.querySelectorAll(".mood-chip").forEach(c => {
+    c.classList.toggle("selected", isEdit && c.dataset.mood === existingEntry.mood);
+  });
 
-  // Focus first input
-  setTimeout(() => document.getElementById("cafeName")?.focus(), 100);
+  // Tags
+  renderTagsInForm();
+
+  // Flavor sliders
+  document.querySelectorAll(".flavor-range").forEach(r => {
+    const val = isEdit && existingEntry.flavors ? (existingEntry.flavors[r.dataset.flavor] || 30) : 30;
+    r.value = val;
+    r.nextElementSibling.textContent = val;
+  });
+
+  // Photos
+  const grid = document.getElementById("photoPreviewGrid");
+  if (grid) {
+    grid.innerHTML = "";
+    if (isEdit && existingEntry.photos) {
+      existingEntry.photos.forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "photo-preview";
+        grid.appendChild(img);
+      });
+    }
+  }
+
+  // Step UI — show step 1
+  showFormStep(1);
+
+  if (!isEdit) setTimeout(() => document.getElementById("cafeName")?.focus(), 100);
 }
 
 function closeNewEntryModal() {
   document.getElementById("newEntryModal")?.classList.remove("open");
   document.body.style.overflow = "";
   document.getElementById("entryForm")?.reset();
+  State.set("editingEntryId", null);
+}
+
+/* ── Stepped Form ── */
+function showFormStep(step) {
+  document.querySelectorAll(".form-step").forEach(s => {
+    s.style.display = s.dataset.step == step ? "" : "none";
+  });
+  document.getElementById("stepBack").style.display  = step === 1 ? "none" : "";
+  document.getElementById("stepNext").style.display  = step === 1 ? "" : "none";
+  document.querySelector(".submit-btn").style.display = step === 2 ? "" : "none";
+
+  // Update step indicator
+  document.querySelectorAll(".step-dot").forEach(d => {
+    d.classList.toggle("active", parseInt(d.dataset.step) === step);
+  });
 }
 
 /* ── Form: Tags ── */
@@ -70,7 +129,6 @@ function renderTagsInForm() {
   const input     = document.getElementById("tagInput");
   if (!container || !input) return;
 
-  // Remove existing pills (keep input)
   container.querySelectorAll(".tag-pill").forEach(el => el.remove());
 
   const tags = State.get("currentTags");
@@ -83,8 +141,7 @@ function renderTagsInForm() {
 
   container.querySelectorAll(".tag-remove").forEach(el => {
     el.addEventListener("click", () => {
-      const newTags = State.get("currentTags").filter(t => t !== el.dataset.tag);
-      State.set("currentTags", newTags);
+      State.set("currentTags", State.get("currentTags").filter(t => t !== el.dataset.tag));
       renderTagsInForm();
     });
   });
@@ -107,9 +164,23 @@ function handlePhotoUpload(files) {
         img.alt = "Preview";
         grid.appendChild(img);
       }
+
+      // Live flavor preview update
+      updateFlavorPreview();
     };
     reader.readAsDataURL(file);
   });
+}
+
+/* ── Live Flavor Preview ── */
+function updateFlavorPreview() {
+  const preview = document.getElementById("flavorPreview");
+  if (!preview) return;
+  const flavors = {};
+  document.querySelectorAll(".flavor-range").forEach(r => {
+    flavors[r.dataset.flavor] = parseInt(r.value);
+  });
+  preview.innerHTML = renderFlavorBars(flavors);
 }
 
 /* ── Form Submission ── */
@@ -123,14 +194,14 @@ function handleFormSubmit(e) {
     return;
   }
 
-  // Collect flavors from sliders
   const flavors = {};
   document.querySelectorAll(".flavor-range").forEach(r => {
     flavors[r.dataset.flavor] = parseInt(r.value);
   });
 
-  const entry = {
-    id:      generateId(),
+  const editingId = State.get("editingEntryId");
+
+  const entryData = {
     cafe,
     drink,
     rating:  State.get("currentRating"),
@@ -142,22 +213,30 @@ function handleFormSubmit(e) {
     photos:  State.get("currentPhotos"),
   };
 
-  State.addEntry(entry);
+  if (editingId) {
+    State.updateEntry(editingId, entryData);
+    showToast("✏️ Entry updated!");
+  } else {
+    State.addEntry({ id: generateId(), ...entryData });
+    showToast("☕ Entry saved to your diary!");
+  }
+
   closeNewEntryModal();
   renderPage(State.get("currentPage"));
-  showToast("☕ Entry saved to your diary!");
 }
 
 /* ── Init Modal Event Listeners ── */
 function initModalListeners() {
-  // Open
-  document.getElementById("newEntryBtn")?.addEventListener("click", openNewEntryModal);
+  document.getElementById("newEntryBtn")?.addEventListener("click", () => openNewEntryModal());
 
-  // Close
   document.getElementById("closeModal")?.addEventListener("click", closeNewEntryModal);
   document.getElementById("newEntryModal")?.addEventListener("click", e => {
     if (e.target === document.getElementById("newEntryModal")) closeNewEntryModal();
   });
+
+  // Step navigation
+  document.getElementById("stepNext")?.addEventListener("click", () => showFormStep(2));
+  document.getElementById("stepBack")?.addEventListener("click", () => showFormStep(1));
 
   // Star rating
   document.getElementById("starInput")?.addEventListener("click", e => {
@@ -170,7 +249,6 @@ function initModalListeners() {
     });
   });
 
-  // Hover stars
   document.getElementById("starInput")?.addEventListener("mouseover", e => {
     const btn = e.target.closest(".star-btn");
     if (!btn) return;
@@ -191,7 +269,7 @@ function initModalListeners() {
   document.getElementById("moodGrid")?.addEventListener("click", e => {
     const chip = e.target.closest(".mood-chip");
     if (!chip) return;
-    const mood = chip.dataset.mood;
+    const mood    = chip.dataset.mood;
     const current = State.get("currentMood");
     const newMood = current === mood ? "" : mood;
     State.set("currentMood", newMood);
@@ -200,7 +278,7 @@ function initModalListeners() {
     });
   });
 
-  // Tags input
+  // Tags
   document.getElementById("tagInput")?.addEventListener("keydown", e => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -215,11 +293,11 @@ function initModalListeners() {
     }
   });
 
-  // Flavor sliders
+  // Flavor sliders — live preview
   document.querySelectorAll(".flavor-range").forEach(r => {
     r.addEventListener("input", () => {
-      const valEl = r.nextElementSibling;
-      if (valEl) valEl.textContent = r.value;
+      r.nextElementSibling.textContent = r.value;
+      updateFlavorPreview();
     });
   });
 
@@ -231,7 +309,7 @@ function initModalListeners() {
   // Form submit
   document.getElementById("entryForm")?.addEventListener("submit", handleFormSubmit);
 
-  // Keyboard escape
+  // Escape key
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") {
       closeNewEntryModal();

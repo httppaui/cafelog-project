@@ -9,7 +9,7 @@ async function fetchAIRecommendations() {
     .map(e => `${e.cafe}: ${e.drink} (${e.rating}★) — Tags: ${(e.tags || []).join(", ")} — Mood: ${e.mood || "n/a"}`)
     .join("\n");
 
-  const avgFlavors = State.avgFlavors();
+  const avgFlavors    = State.avgFlavors();
   const flavorSummary = Object.entries(avgFlavors)
     .map(([k, v]) => `${k}: ${v}/100`)
     .join(", ");
@@ -48,29 +48,27 @@ Give exactly 4 recommendations. Mix new drink suggestions and café style sugges
     });
 
     const data = await response.json();
-
     if (data.error) throw new Error(data.error.message);
 
-    const text  = (data.content || []).map(c => c.text || "").join("");
-    const clean = text.replace(/```json|```/g, "").trim();
+    const text   = (data.content || []).map(c => c.text || "").join("");
+    const clean  = text.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
 
     State.set("aiRecommendations", parsed.recommendations);
   } catch (err) {
     console.error("AI fetch error:", err);
-    // Graceful fallback
     State.set("aiRecommendations", [
       {
         emoji: "🌸",
         name: "Kenya AA Pour Over",
         type: "drink",
-        reason: "Your love of floral and fruity notes suggests you'd adore Kenya's bright, berry-forward, wine-like profile. It's a natural evolution from the Ethiopian pour overs you've been enjoying."
+        reason: "Your love of floral and fruity notes suggests you'd adore Kenya's bright, berry-forward profile. It's a natural evolution from the Ethiopian pour overs you've been enjoying."
       },
       {
         emoji: "🧊",
         name: "Japanese Iced Pour Over",
         type: "drink",
-        reason: "Given your appreciation for the craft of specialty coffee, this precise Japanese flash-chilled method would highlight every nuance of your favorite light roasts."
+        reason: "Given your appreciation for specialty coffee craft, this flash-chilled method would highlight every nuance of your favorite light roasts in a refreshing new way."
       },
       {
         emoji: "🫖",
@@ -82,7 +80,7 @@ Give exactly 4 recommendations. Mix new drink suggestions and café style sugges
         emoji: "🌺",
         name: "Cascara Tea",
         type: "drink",
-        reason: "Made from the dried coffee fruit husk, it's floral, hibiscus-like, and sweet — your high scores on floral and fruity suggest you'd love this unique side of the coffee plant."
+        reason: "Made from dried coffee fruit husk, it's floral and hibiscus-like — your high scores on floral and fruity suggest you'd love this unique side of the coffee plant."
       }
     ]);
   }

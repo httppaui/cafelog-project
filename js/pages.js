@@ -2,7 +2,8 @@
 
 function renderPage(page) {
   const container = document.getElementById("pageContent");
-  const titles = {
+
+  document.getElementById("pageTitle").textContent = {
     journal:  "cafélog",
     calendar: "Calendar View",
     timeline: "My Timeline",
@@ -11,11 +12,8 @@ function renderPage(page) {
     sensory:  "Sensory Memory Map",
     wishlist: "Café Wishlist",
     notepad:  "My Notepad",
-  };
+  }[page] || "cafélog";
 
-  document.getElementById("pageTitle").textContent = titles[page] || "cafélog";
-
-  // Show/hide topbar controls based on page
   const searchBar  = document.getElementById("searchBarWrapper");
   const viewToggle = document.getElementById("viewToggle");
   const showSearch = page === "journal";
@@ -24,10 +22,10 @@ function renderPage(page) {
 
   container.innerHTML = "";
   container.className = "page-content page-enter";
-  void container.offsetWidth; // trigger reflow for animation
+  void container.offsetWidth;
 
   switch (page) {
-    case "journal":  renderJournalPage(container); break;
+    case "journal":  renderJournalPage(container);  break;
     case "calendar": renderCalendarPage(container); break;
     case "timeline": renderTimelinePage(container); break;
     case "mood":     renderMoodPage(container);     break;
@@ -40,8 +38,8 @@ function renderPage(page) {
 
 /* ── Journal ── */
 function renderJournalPage(container) {
-  const stats   = State.stats();
-  const entries = State.filteredEntries();
+  const stats    = State.stats();
+  const entries  = State.filteredEntries();
   const listMode = State.get("viewMode") === "list";
 
   let html = renderStatCards(stats);
@@ -60,10 +58,9 @@ function renderJournalPage(container) {
 
   container.innerHTML = html;
 
-  // Attach card click listeners
   container.querySelectorAll(".entry-card").forEach(card => {
     const handler = () => {
-      const id = parseInt(card.dataset.id);
+      const id    = parseInt(card.dataset.id);
       const entry = State.get("entries").find(e => e.id === id);
       if (entry) openDetailModal(entry);
     };
@@ -71,7 +68,6 @@ function renderJournalPage(container) {
     card.addEventListener("keydown", e => e.key === "Enter" && handler());
   });
 
-  // Update streak
   document.getElementById("streakNumber").textContent = State.get("entries").length;
 }
 
@@ -83,7 +79,6 @@ function renderCalendarPage(container) {
 
   let html = renderCalendar(month, year, entries);
 
-  // Month's entries list
   const monthEntries = entries.filter(e => {
     const d = new Date(e.date + "T00:00:00");
     return d.getMonth() === month && d.getFullYear() === year;
@@ -127,10 +122,23 @@ function renderCalendarPage(container) {
     renderPage("calendar");
   });
 
-  // Entry links
+  // Clickable calendar days with entries
+  container.querySelectorAll(".cal-day.has-entry").forEach(day => {
+    day.addEventListener("click", () => {
+      const dayNum = parseInt(day.dataset.day);
+      const match  = entries.find(e => {
+        const d = new Date(e.date + "T00:00:00");
+        return d.getMonth() === month && d.getFullYear() === year && d.getDate() === dayNum;
+      });
+      if (match) openDetailModal(match);
+    });
+    day.addEventListener("keydown", e => e.key === "Enter" && day.click());
+  });
+
+  // Entry row links
   container.querySelectorAll(".entry-card-link").forEach(el => {
     el.addEventListener("click", () => {
-      const id = parseInt(el.dataset.id);
+      const id    = parseInt(el.dataset.id);
       const entry = State.get("entries").find(e => e.id === id);
       if (entry) openDetailModal(entry);
     });
@@ -168,11 +176,13 @@ function renderTimelinePage(container) {
 
   container.innerHTML = html;
   container.querySelectorAll(".timeline-item").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = parseInt(el.dataset.id);
+    const open = () => {
+      const id    = parseInt(el.dataset.id);
       const entry = State.get("entries").find(e => e.id === id);
       if (entry) openDetailModal(entry);
-    });
+    };
+    el.addEventListener("click", open);
+    el.addEventListener("keydown", e => e.key === "Enter" && open());
   });
 }
 
@@ -220,18 +230,20 @@ function renderMoodPage(container) {
   });
 }
 
-/* ── AI Picks ── */
+/* ── AI / Recommendations ── */
 function renderAIPage(container) {
-  const recs     = State.get("aiRecommendations");
-  const loading  = State.get("aiLoading");
-  const entries  = State.get("entries");
+  const recs    = State.get("aiRecommendations");
+  const loading = State.get("aiLoading");
+  const entries = State.get("entries");
 
   let html = `
     <div class="ai-panel">
       <div class="ai-panel-title">✨ Your Personal Coffee Sommelier</div>
       <div class="ai-panel-subtitle">Powered by AI — based on your ${entries.length} journal entries and flavor preferences</div>
       <button class="ai-generate-btn" id="generateAIBtn" ${loading ? "disabled" : ""}>
-        ${loading ? `<span class="spinner"></span> Brewing recommendations…` : `<span>✨</span> Generate Recommendations`}
+        ${loading
+          ? `<span class="spinner"></span> Brewing recommendations…`
+          : `<span>✨</span> ${recs ? "Refresh Recommendations" : "Generate Recommendations"}`}
       </button>
       ${recs ? `<div class="ai-recs">
         ${recs.map(r => `
@@ -241,10 +253,12 @@ function renderAIPage(container) {
             <div class="rec-type">${escapeHtml(r.type || "")}</div>
             <div class="rec-desc">${escapeHtml(r.reason)}</div>
           </div>`).join("")}
-      </div>` : ""}
+      </div>` : `
+        <div style="margin-top:16px;font-size:13px;opacity:0.65;">
+          Hit Generate to get personalized picks based on your journal.
+        </div>`}
     </div>`;
 
-  // Top cafes list
   const cafeCounts = {};
   entries.forEach(e => {
     if (!cafeCounts[e.cafe]) cafeCounts[e.cafe] = { count: 0, totalRating: 0 };
@@ -259,35 +273,34 @@ function renderAIPage(container) {
   html += `
     <div style="background:white;border-radius:var(--radius-xl);padding:26px;border:1px solid var(--mist)">
       <div class="section-label">Your Top Cafés</div>
-      ${cafeList.length ? cafeList.map(([cafe, d]) => `
-        <div class="top-cafe-row">
-          <div>
-            <div class="top-cafe-name">${escapeHtml(cafe)}</div>
-            <div class="top-cafe-meta">${d.count} visit${d.count !== 1 ? "s" : ""}</div>
-          </div>
-          <div class="star-row">${renderStars(Math.round(d.totalRating / d.count))}</div>
-        </div>`).join("") : `<p style="color:var(--bark);font-size:14px">No entries yet.</p>`}
+      ${cafeList.length
+        ? cafeList.map(([cafe, d]) => `
+          <div class="top-cafe-row">
+            <div>
+              <div class="top-cafe-name">${escapeHtml(cafe)}</div>
+              <div class="top-cafe-meta">${d.count} visit${d.count !== 1 ? "s" : ""}</div>
+            </div>
+            <div class="star-row">${renderStars(Math.round(d.totalRating / d.count))}</div>
+          </div>`).join("")
+        : `<p style="color:var(--bark);font-size:14px">No entries yet.</p>`}
     </div>`;
 
   container.innerHTML = html;
 
-  document.getElementById("generateAIBtn")?.addEventListener("click", () => {
-    fetchAIRecommendations();
-  });
+  document.getElementById("generateAIBtn")?.addEventListener("click", fetchAIRecommendations);
 }
 
 /* ── Sensory Map ── */
 function renderSensoryPage(container) {
-  const entries     = State.get("entries").filter(e => e.flavors && Object.keys(e.flavors).length > 0);
-  const avgFlavors  = State.avgFlavors();
+  const entries    = State.get("entries").filter(e => e.flavors && Object.keys(e.flavors).length > 0);
+  const avgFlavors = State.avgFlavors();
 
   let html = `
     <div class="sensory-header-card">
       <div class="sensory-header-title">🎨 Sensory Memory Map</div>
       <div class="sensory-header-sub">
-        <strong style="color:var(--mocha)">Unique Feature:</strong> Your personalized flavor fingerprint — built from every entry you log. 
-        Track how your palate evolves, find your flavor comfort zones, and use this map 
-        to communicate your taste to baristas — like a coffee passport.
+        Your personalized flavor fingerprint — built from every entry you log.
+        Track how your palate evolves and use this map to communicate your taste to baristas.
       </div>
     </div>`;
 
@@ -301,7 +314,7 @@ function renderSensoryPage(container) {
   }
 
   if (!entries.length) {
-    html += `<div class="empty-state"><div class="empty-state-icon">🎨</div><div class="empty-state-title">No flavor data yet</div><p>Add flavor sliders when creating entries to see your sensory map grow.</p></div>`;
+    html += `<div class="empty-state"><div class="empty-state-icon">🎨</div><div class="empty-state-title">No flavor data yet</div><p>Add flavor sliders when creating entries to build your sensory map.</p></div>`;
   } else {
     html += `<div class="sensory-grid">` + entries.map(e => `
       <div class="sensory-card">
@@ -338,7 +351,6 @@ function renderWishlistPage(container) {
 
   container.innerHTML = html;
 
-  // Add item
   const addFn = () => {
     const name = document.getElementById("wishlistCafeName")?.value.trim();
     const loc  = document.getElementById("wishlistCafeLocation")?.value.trim();
@@ -353,7 +365,6 @@ function renderWishlistPage(container) {
     if (e.key === "Enter") addFn();
   });
 
-  // Toggle visited
   container.querySelectorAll("[data-toggle-id]").forEach(el => {
     el.addEventListener("click", () => {
       State.toggleWishlistItem(parseInt(el.dataset.toggleId));
@@ -368,7 +379,6 @@ function renderWishlistPage(container) {
     });
   });
 
-  // Delete item
   container.querySelectorAll("[data-delete-id]").forEach(btn => {
     btn.addEventListener("click", () => {
       State.deleteWishlistItem(parseInt(btn.dataset.deleteId));
@@ -386,15 +396,15 @@ function renderNotepadPage(container) {
       Jot down brewing ratios, café recommendations, coffee quotes — anything you want to remember.
     </p>
     <div style="background:white;border-radius:var(--radius-xl);border:1.5px solid var(--mist);overflow:hidden;">
-      <input 
-        id="notepadTitle" 
+      <input
+        id="notepadTitle"
         type="text"
         placeholder="Title"
         style="width:100%;padding:18px 20px 0;border:none;outline:none;font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:var(--espresso);background:transparent;"
       />
-      <textarea 
-        class="notepad-area" 
-        id="notepadTextarea" 
+      <textarea
+        class="notepad-area"
+        id="notepadTextarea"
         placeholder="Start writing…"
         style="border:none;border-radius:0;border-top:1px solid var(--mist);margin-top:10px;"
       ></textarea>
@@ -410,16 +420,8 @@ function renderNotepadPage(container) {
     ${items.length ? `
     <div style="margin-top:32px">
       <div class="section-label">Saved Notes</div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        ${items.map(item => `
-          <div style="background:white;border-radius:var(--radius-lg);padding:22px 24px;border:1px solid var(--mist);">
-            ${item.title ? `<div style="font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--espresso);margin-bottom:8px;font-weight:700;">${escapeHtml(item.title)}</div>` : ""}
-            <p style="font-family:'Be Vietnam Pro',sans-serif;font-style:italic;font-size:14px;color:var(--ink);line-height:1.9;white-space:pre-wrap;">${escapeHtml(item.content)}</p>
-            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--mist);display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;color:var(--latte);text-transform:uppercase;letter-spacing:0.5px;">${item.date} · ${countWords(item.content)} words</span>
-              <button style="background:none;border:none;color:var(--latte);font-size:13px;cursor:pointer;" data-delete-note="${item.id}">🗑 Delete</button>
-            </div>
-          </div>`).join("")}
+      <div style="display:flex;flex-direction:column;gap:12px;" id="notesList">
+        ${items.map(item => renderNoteCard(item)).join("")}
       </div>
     </div>` : ""}`;
 
@@ -447,13 +449,84 @@ function renderNotepadPage(container) {
   });
 
   document.getElementById("clearNotepad")?.addEventListener("click", () => {
-    if (document.getElementById("notepadTitle")?.value || textarea.value) {
-      if (confirm("Clear the current note?")) {
-        renderPage("notepad");
-      }
+    if (document.getElementById("notepadTitle")?.value || textarea?.value) {
+      if (confirm("Clear the current draft?")) renderPage("notepad");
     }
   });
 
+  bindNoteCardListeners(container);
+}
+
+function renderNoteCard(item, editMode = false) {
+  if (editMode) {
+    return `
+      <div class="note-card" data-note-id="${item.id}">
+        <input class="note-edit-title" type="text" value="${escapeHtml(item.title || "")}"
+          placeholder="Title"
+          style="width:100%;border:none;outline:none;font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--espresso);background:transparent;margin-bottom:8px;font-weight:700;" />
+        <textarea class="note-edit-body notepad-area"
+          style="min-height:120px;border:1px solid var(--mist);border-radius:var(--radius-md);font-size:13px;padding:12px;"
+        >${escapeHtml(item.content)}</textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
+          <button class="new-entry-btn note-cancel-edit" data-note-id="${item.id}"
+            style="background:var(--mist);color:var(--espresso);padding:7px 16px;font-size:13px;">Cancel</button>
+          <button class="new-entry-btn note-save-edit" data-note-id="${item.id}"
+            style="background:var(--caramel);padding:7px 16px;font-size:13px;">Save</button>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="note-card" data-note-id="${item.id}" style="background:white;border-radius:var(--radius-lg);padding:22px 24px;border:1px solid var(--mist);">
+      ${item.title ? `<div style="font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--espresso);margin-bottom:8px;font-weight:700;">${escapeHtml(item.title)}</div>` : ""}
+      <p style="font-family:'Be Vietnam Pro',sans-serif;font-style:italic;font-size:14px;color:var(--ink);line-height:1.9;white-space:pre-wrap;">${escapeHtml(item.content)}</p>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--mist);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:11px;color:var(--latte);text-transform:uppercase;letter-spacing:0.5px;">${item.date} · ${countWords(item.content)} words</span>
+        <div style="display:flex;gap:8px;">
+          <button style="background:none;border:1px solid var(--mist);border-radius:var(--radius-full);color:var(--bark);font-size:12px;padding:4px 12px;cursor:pointer;" data-edit-note="${item.id}">✏️ Edit</button>
+          <button style="background:none;border:none;color:var(--latte);font-size:13px;cursor:pointer;" data-delete-note="${item.id}">🗑 Delete</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function bindNoteCardListeners(container) {
+  // Edit button — swap card to edit mode
+  container.querySelectorAll("[data-edit-note]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id   = parseInt(btn.dataset.editNote);
+      const item = State.get("notepadItems").find(n => n.id === id);
+      if (!item) return;
+      const card = container.querySelector(`.note-card[data-note-id="${id}"]`);
+      if (card) {
+        card.outerHTML; // read before replace
+        card.insertAdjacentHTML("afterend", renderNoteCard(item, true));
+        card.remove();
+        bindNoteCardListeners(container);
+      }
+    });
+  });
+
+  // Save edit
+  container.querySelectorAll(".note-save-edit").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id    = parseInt(btn.dataset.noteId);
+      const card  = container.querySelector(`.note-card[data-note-id="${id}"]`);
+      const title = card?.querySelector(".note-edit-title")?.value.trim();
+      const content = card?.querySelector(".note-edit-body")?.value.trim();
+      if (!content) { showToast("Note can't be empty!"); return; }
+      State.updateNotepadItem(id, { title, content });
+      showToast("📝 Note updated!");
+      renderPage("notepad");
+    });
+  });
+
+  // Cancel edit
+  container.querySelectorAll(".note-cancel-edit").forEach(btn => {
+    btn.addEventListener("click", () => renderPage("notepad"));
+  });
+
+  // Delete
   container.querySelectorAll("[data-delete-note]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (confirm("Delete this note?")) {
@@ -474,6 +547,6 @@ function deleteEntryFromDetail(id) {
   if (!confirm("Delete this entry?")) return;
   State.deleteEntry(id);
   closeDetailModal();
-  renderPage("journal");
+  renderPage(State.get("currentPage"));
   showToast("Entry deleted");
 }

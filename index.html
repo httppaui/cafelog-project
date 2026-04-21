@@ -16,98 +16,121 @@
   <link rel="stylesheet" href="css/pages.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/components-additions.css" />
 </head>
 <body>
-  <div class="app-wrapper">
+<div class="app-wrapper">
 
-    <!-- Mobile top bar -->
-    <header class="mobile-topbar">
-      <div class="mobile-logo"><img src="assets/cafelog.png" alt="cafélog" class="logo-img-mobile" /></div>
+  <!-- Mobile top bar -->
+  <header class="mobile-topbar">
+    <div class="mobile-logo"><img src="assets/cafelog.png" alt="cafélog" class="logo-img-mobile" /></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="global-search-trigger" id="globalSearchBtn" aria-label="Search">🔍</button>
       <button class="hamburger" id="hamburger" aria-label="Open menu">
         <span></span><span></span><span></span>
       </button>
-    </header>
+    </div>
+  </header>
 
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-      <div class="sidebar-overlay" id="sidebarOverlay"></div>
-      <div class="sidebar-inner">
-        <div class="sidebar-logo">
-          <img src="assets/cafelog.png" alt="cafélog" class="logo-img" />
-        </div>
-
-        <span class="nav-section-label">Journal</span>
-        <a class="nav-item active" data-page="journal" href="#journal">
-          My Entries
-        </a>
-        <a class="nav-item" data-page="calendar" href="#calendar">
-          Calendar
-        </a>
-        <a class="nav-item" data-page="timeline" href="#timeline">
-          Timeline
-        </a>
-
-        <span class="nav-section-label">Explore</span>
-        <a class="nav-item" data-page="mood" href="#mood">
-          Mood & Coffee
-        </a>
-        <a class="nav-item" data-page="ai" href="#ai">
-          Recommendations
-        </a>
-        <a class="nav-item" data-page="sensory" href="#sensory">
-          Sensory Map
-        </a>
-
-        <span class="nav-section-label">My Space</span>
-        <a class="nav-item" data-page="wishlist" href="#wishlist">
-          Café Wishlist
-        </a>
-        <a class="nav-item" data-page="notepad" href="#notepad">
-          My Notepad
-        </a>
-
-        <div class="sidebar-bottom">
-          <div class="streak-badge">
-            <span class="streak-label">☕ brews logged</span>
-            <span class="streak-number" id="streakNumber">4</span>
-            <span class="streak-sub">keep sipping!</span>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="main" id="mainContent">
-      <div class="topbar">
-        <h1 class="page-title" id="pageTitle">cafélog</h1>
-        <div class="topbar-actions">
-          <div class="search-bar" id="searchBarWrapper">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search cafés, drinks, tags…" />
-          </div>
-          <div class="view-toggle" id="viewToggle">
-            <button class="view-btn active" data-view="grid">Grid</button>
-            <button class="view-btn" data-view="list">List</button>
-          </div>
-          <button class="new-entry-btn" id="newEntryBtn">
-            <span>＋</span> New Entry
-          </button>
-        </div>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-inner">
+      <div class="sidebar-logo">
+        <img src="assets/cafelog.png" alt="cafélog" class="logo-img" />
       </div>
 
-      <div class="page-content" id="pageContent">
-        <!-- Pages rendered by JS -->
+      <span class="nav-section-label">Journal</span>
+      <a class="nav-item active" data-page="journal"  href="#journal">My Entries</a>
+      <a class="nav-item"        data-page="calendar" href="#calendar">Calendar</a>
+      <a class="nav-item"        data-page="timeline" href="#timeline">Timeline</a>
+
+      <span class="nav-section-label">Explore</span>
+      <a class="nav-item" data-page="mood"    href="#mood">Mood & Coffee</a>
+      <a class="nav-item" data-page="ai"      href="#ai">Recommendations</a>
+      <a class="nav-item" data-page="sensory" href="#sensory">Sensory Map</a>
+
+      <span class="nav-section-label">My Space</span>
+      <a class="nav-item" data-page="wishlist" href="#wishlist">Café Wishlist</a>
+      <a class="nav-item" data-page="notepad"  href="#notepad">My Notepad</a>
+
+      <div class="sidebar-bottom">
+        <div class="streak-badge">
+          <span class="streak-label">☕ brews logged</span>
+          <span class="streak-number" id="streakNumber">4</span>
+          <span class="streak-sub">keep sipping!</span>
+        </div>
       </div>
-    </main>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main" id="mainContent">
+    <div class="topbar">
+      <h1 class="page-title" id="pageTitle">cafélog</h1>
+      <div class="topbar-actions">
+        <div class="search-bar" id="searchBarWrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search cafés, drinks, tags…" />
+        </div>
+        <!-- Global search button (desktop) -->
+        <button class="global-search-trigger desktop-only" id="globalSearchBtn" title="Search all entries (⌘K)" aria-label="Global search">
+          🔍 Search
+        </button>
+        <div class="view-toggle" id="viewToggle">
+          <button class="view-btn active" data-view="grid">Grid</button>
+          <button class="view-btn" data-view="list">List</button>
+        </div>
+        <button class="new-entry-btn" id="newEntryBtn">
+          <span>＋</span> New Entry
+        </button>
+      </div>
+    </div>
+
+    <div class="page-content" id="pageContent"></div>
+  </main>
+</div>
+
+<!-- Global Search Overlay -->
+<div class="modal-overlay" id="globalSearchOverlay">
+  <div class="modal" style="max-width:580px;" role="dialog" aria-modal="true" aria-label="Search entries">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <span style="font-size:18px;">🔍</span>
+      <input
+        type="text"
+        id="globalSearchInput"
+        placeholder="Search all entries — cafés, drinks, notes, tags…"
+        style="flex:1;border:none;outline:none;font-size:15px;color:var(--ink);background:transparent;"
+        autocomplete="off"
+      />
+      <button onclick="closeGlobalSearch()" style="background:var(--foam);border:none;border-radius:50%;width:30px;height:30px;font-size:14px;color:var(--bark);cursor:pointer;">✕</button>
+    </div>
+    <div style="border-top:1px solid var(--mist);padding-top:14px;">
+      <div id="globalSearchResults" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;"></div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--latte);text-align:center;letter-spacing:0.5px;">
+      Press ESC to close · ⌘K to open anytime
+    </div>
   </div>
+</div>
 
-  <!-- New Entry Modal -->
-  <div class="modal-overlay" id="newEntryModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <button class="modal-close" id="closeModal">✕</button>
-      <h2 class="modal-title" id="modalTitle">New Entry ☕</h2>
-      <form id="entryForm" novalidate>
+<!-- New Entry Modal -->
+<div class="modal-overlay" id="newEntryModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="closeModal">✕</button>
+    <h2 class="modal-title" id="modalTitle">New Entry ☕</h2>
 
+    <!-- Step indicator -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px;">
+      <div class="step-dot active" data-step="1" style="width:8px;height:8px;border-radius:50%;background:var(--caramel);transition:all 0.2s;"></div>
+      <div style="width:32px;height:2px;background:var(--mist);border-radius:2px;"></div>
+      <div class="step-dot" data-step="2" style="width:8px;height:8px;border-radius:50%;background:var(--mist);transition:all 0.2s;"></div>
+    </div>
+
+    <form id="entryForm" novalidate>
+
+      <!-- Step 1: Essentials -->
+      <div class="form-step" data-step="1">
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="cafeName">Café Name *</label>
@@ -150,14 +173,18 @@
         <div class="form-group">
           <label class="form-label">Mood</label>
           <div class="mood-grid" id="moodGrid">
-            <div class="mood-chip mood-cozy" data-mood="cozy">🧸 Cozy</div>
-            <div class="mood-chip mood-energized" data-mood="energized">⚡ Energized</div>
+            <div class="mood-chip mood-cozy"       data-mood="cozy">🧸 Cozy</div>
+            <div class="mood-chip mood-energized"  data-mood="energized">⚡ Energized</div>
             <div class="mood-chip mood-reflective" data-mood="reflective">🌙 Reflective</div>
-            <div class="mood-chip mood-social" data-mood="social">💬 Social</div>
-            <div class="mood-chip mood-peaceful" data-mood="peaceful">🌿 Peaceful</div>
-            <div class="mood-chip mood-curious" data-mood="curious">✨ Curious</div>
+            <div class="mood-chip mood-social"     data-mood="social">💬 Social</div>
+            <div class="mood-chip mood-peaceful"   data-mood="peaceful">🌿 Peaceful</div>
+            <div class="mood-chip mood-curious"    data-mood="curious">✨ Curious</div>
           </div>
         </div>
+      </div>
+
+      <!-- Step 2: Details -->
+      <div class="form-step" data-step="2" style="display:none;">
 
         <div class="form-group">
           <label class="form-label">Tags</label>
@@ -167,21 +194,21 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Flavor Profile (Sensory Map)</label>
+          <label class="form-label">Flavor Profile</label>
           <div class="flavor-sliders" id="flavorSliders">
             <div class="flavor-slider-row">
               <span class="flavor-slider-label">Nutty</span>
-              <input type="range" class="flavor-range" data-flavor="Nutty" min="0" max="100" value="30" />
+              <input type="range" class="flavor-range" data-flavor="Nutty"     min="0" max="100" value="30" />
               <span class="flavor-slider-val">30</span>
             </div>
             <div class="flavor-slider-row">
               <span class="flavor-slider-label">Fruity</span>
-              <input type="range" class="flavor-range" data-flavor="Fruity" min="0" max="100" value="30" />
+              <input type="range" class="flavor-range" data-flavor="Fruity"    min="0" max="100" value="30" />
               <span class="flavor-slider-val">30</span>
             </div>
             <div class="flavor-slider-row">
               <span class="flavor-slider-label">Floral</span>
-              <input type="range" class="flavor-range" data-flavor="Floral" min="0" max="100" value="30" />
+              <input type="range" class="flavor-range" data-flavor="Floral"    min="0" max="100" value="30" />
               <span class="flavor-slider-val">30</span>
             </div>
             <div class="flavor-slider-row">
@@ -191,50 +218,66 @@
             </div>
             <div class="flavor-slider-row">
               <span class="flavor-slider-label">Sweet</span>
-              <input type="range" class="flavor-range" data-flavor="Sweet" min="0" max="100" value="30" />
+              <input type="range" class="flavor-range" data-flavor="Sweet"     min="0" max="100" value="30" />
               <span class="flavor-slider-val">30</span>
             </div>
             <div class="flavor-slider-row">
               <span class="flavor-slider-label">Bitter</span>
-              <input type="range" class="flavor-range" data-flavor="Bitter" min="0" max="100" value="30" />
+              <input type="range" class="flavor-range" data-flavor="Bitter"    min="0" max="100" value="30" />
               <span class="flavor-slider-val">30</span>
             </div>
           </div>
+          <!-- Live flavor preview -->
+          <div id="flavorPreview" style="margin-top:14px;padding:14px;background:var(--foam);border-radius:var(--radius-md);"></div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Photo</label>
           <div class="photo-upload-area" id="photoUploadArea">
-            <input type="file" id="photoInput" accept="image/*" multiple />
+            <!-- capture="environment" enables camera on mobile -->
+            <input type="file" id="photoInput" accept="image/*" multiple capture="environment" />
             <div class="upload-placeholder">
               <span style="font-size:32px">📸</span>
-              <p>Click to upload café photos</p>
+              <p>Tap to take a photo or upload</p>
               <span class="upload-hint">Latte art, ambiance, menus…</span>
             </div>
             <div class="photo-preview-grid" id="photoPreviewGrid"></div>
           </div>
         </div>
 
-        <button type="submit" class="submit-btn">Save to Diary ☕</button>
-      </form>
-    </div>
-  </div>
+      </div>
 
-  <!-- Detail Modal -->
-  <div class="modal-overlay" id="detailModal">
-    <div class="modal detail-modal" id="detailModalContent" role="dialog" aria-modal="true">
-      <button class="modal-close" id="closeDetailModal">✕</button>
-      <!-- Populated by JS -->
-    </div>
-  </div>
+      <!-- Navigation buttons -->
+      <div style="display:flex;gap:10px;margin-top:6px;align-items:center;">
+        <button type="button" id="stepBack" class="submit-btn"
+          style="display:none;background:var(--mist);color:var(--espresso);font-family:'DM Sans',sans-serif;font-style:normal;font-size:14px;font-weight:600;flex:0 0 auto;width:auto;padding:14px 22px;">
+          ← Back
+        </button>
+        <button type="button" id="stepNext" class="submit-btn"
+          style="background:var(--caramel);color:white;font-family:'DM Sans',sans-serif;font-style:normal;font-size:15px;font-weight:600;">
+          Next: Details →
+        </button>
+        <button type="submit" class="submit-btn" style="display:none;">Save to Diary ☕</button>
+      </div>
 
-  <script src="js/data.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/render.js"></script>
-  <script src="js/pages.js"></script>
-  <script src="js/modal.js"></script>
-  <script src="js/ai.js"></script>
-  <script src="js/app.js"></script>
+    </form>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal detail-modal" id="detailModalContent" role="dialog" aria-modal="true">
+    <button class="modal-close" id="closeDetailModal">✕</button>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/render.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
