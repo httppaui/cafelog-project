@@ -7,7 +7,7 @@ function renderPage(page) {
     calendar: "Calendar View",
     timeline: "My Timeline",
     mood:     "Mood & Coffee",
-    ai:       "AI Picks",
+    ai:       "Recommendations",
     sensory:  "Sensory Memory Map",
     wishlist: "Café Wishlist",
     notepad:  "My Notepad",
@@ -379,45 +379,89 @@ function renderWishlistPage(container) {
 
 /* ── Notepad ── */
 function renderNotepadPage(container) {
-  const savedContent = State.get("notepadContent");
+  const items = State.get("notepadItems") || [];
 
   container.innerHTML = `
-    <div class="notepad-header">
-      <div class="section-label" style="margin-bottom:0">Your personal coffee notepad 📝</div>
-      <span class="notepad-save-indicator" id="saveIndicator">✓ Saved</span>
-    </div>
     <p style="font-size:13px;color:var(--bark);margin-bottom:14px">
       Jot down brewing ratios, café recommendations, coffee quotes — anything you want to remember.
     </p>
-    <textarea class="notepad-area" id="notepadTextarea" placeholder="Start writing… your notes auto-save as you type ✨">${escapeHtml(savedContent)}</textarea>
+    <div style="background:white;border-radius:var(--radius-xl);border:1.5px solid var(--mist);overflow:hidden;">
+      <input 
+        id="notepadTitle" 
+        type="text"
+        placeholder="Title"
+        style="width:100%;padding:18px 20px 0;border:none;outline:none;font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:var(--espresso);background:transparent;"
+      />
+      <textarea 
+        class="notepad-area" 
+        id="notepadTextarea" 
+        placeholder="Start writing…"
+        style="border:none;border-radius:0;border-top:1px solid var(--mist);margin-top:10px;"
+      ></textarea>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-      <span style="font-size:12px;color:var(--latte)" id="notepadWordCount">${countWords(savedContent)} words</span>
-      <button class="new-entry-btn" style="background:var(--sage);padding:8px 18px;font-size:13px" id="clearNotepad">Clear</button>
-    </div>`;
+      <span style="font-size:12px;color:var(--latte)" id="notepadWordCount">0 words</span>
+      <div style="display:flex;gap:8px;">
+        <button class="new-entry-btn" style="background:var(--caramel);padding:8px 18px;font-size:13px" id="saveNotepad">Save Note</button>
+        <button class="new-entry-btn" style="background:var(--sage);padding:8px 18px;font-size:13px" id="clearNotepad">Clear</button>
+      </div>
+    </div>
+
+    ${items.length ? `
+    <div style="margin-top:32px">
+      <div class="section-label">Saved Notes</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${items.map(item => `
+          <div style="background:white;border-radius:var(--radius-lg);padding:22px 24px;border:1px solid var(--mist);">
+            ${item.title ? `<div style="font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--espresso);margin-bottom:8px;font-weight:700;">${escapeHtml(item.title)}</div>` : ""}
+            <p style="font-family:'Be Vietnam Pro',sans-serif;font-style:italic;font-size:14px;color:var(--ink);line-height:1.9;white-space:pre-wrap;">${escapeHtml(item.content)}</p>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--mist);display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:11px;color:var(--latte);text-transform:uppercase;letter-spacing:0.5px;">${item.date} · ${countWords(item.content)} words</span>
+              <button style="background:none;border:none;color:var(--latte);font-size:13px;cursor:pointer;" data-delete-note="${item.id}">🗑 Delete</button>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>` : ""}`;
 
   const textarea  = document.getElementById("notepadTextarea");
-  const indicator = document.getElementById("saveIndicator");
   const wordCount = document.getElementById("notepadWordCount");
 
-  const saveNote = debounce((val) => {
-    State.set("notepadContent", val);
-    indicator.classList.add("visible");
-    setTimeout(() => indicator.classList.remove("visible"), 1800);
-  }, 800);
-
   textarea?.addEventListener("input", () => {
-    const val = textarea.value;
-    wordCount.textContent = `${countWords(val)} words`;
-    saveNote(val);
+    wordCount.textContent = `${countWords(textarea.value)} words`;
+  });
+
+  document.getElementById("saveNotepad")?.addEventListener("click", () => {
+    const title   = document.getElementById("notepadTitle")?.value.trim();
+    const content = textarea.value.trim();
+    if (!content) { showToast("Nothing to save!"); return; }
+
+    State.addNotepadItem({
+      id:      generateId(),
+      title,
+      content,
+      date:    new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    });
+
+    showToast("📝 Note saved!");
+    renderPage("notepad");
   });
 
   document.getElementById("clearNotepad")?.addEventListener("click", () => {
-    if (confirm("Clear your notepad? This cannot be undone.")) {
-      textarea.value = "";
-      State.set("notepadContent", "");
-      wordCount.textContent = "0 words";
-      showToast("Notepad cleared");
+    if (document.getElementById("notepadTitle")?.value || textarea.value) {
+      if (confirm("Clear the current note?")) {
+        renderPage("notepad");
+      }
     }
+  });
+
+  container.querySelectorAll("[data-delete-note]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (confirm("Delete this note?")) {
+        State.deleteNotepadItem(parseInt(btn.dataset.deleteNote));
+        renderPage("notepad");
+        showToast("Note deleted.");
+      }
+    });
   });
 }
 

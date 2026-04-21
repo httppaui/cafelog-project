@@ -16,7 +16,8 @@ const State = (() => {
     selectedMoodPage: null,
     aiRecommendations: null,
     aiLoading: false,
-    notepadContent: "",
+    notepadContent: "",   // keep for backward compat but unused
+    notepadItems: [],
     wishlistItems: [],
     entries: [],
   };
@@ -30,6 +31,7 @@ const State = (() => {
         _state.entries      = parsed.entries      || DEMO_ENTRIES;
         _state.wishlistItems= parsed.wishlistItems|| DEMO_WISHLIST;
         _state.notepadContent= parsed.notepadContent || "";
+        _state.notepadItems   = parsed.notepadItems  || [];
       } else {
         _state.entries       = [...DEMO_ENTRIES];
         _state.wishlistItems = [...DEMO_WISHLIST];
@@ -47,6 +49,7 @@ const State = (() => {
         entries:        _state.entries,
         wishlistItems:  _state.wishlistItems,
         notepadContent: _state.notepadContent,
+        notepadItems:   _state.notepadItems,
       }));
     } catch (e) { console.warn("Could not save to localStorage:", e); }
   }
@@ -128,10 +131,21 @@ const State = (() => {
     );
   }
 
+  function addNotepadItem(item) {
+  _state.notepadItems = [item, ..._state.notepadItems];
+  save();
+}
+
+function deleteNotepadItem(id) {
+  _state.notepadItems = _state.notepadItems.filter(n => n.id !== id);
+  save();
+}
+
   return {
-    load, save, get, getAll, set,
-    addEntry, deleteEntry,
-    addWishlistItem, toggleWishlistItem, deleteWishlistItem,
-    filteredEntries, stats, avgFlavors,
-  };
+  load, save, get, getAll, set,
+  addEntry, deleteEntry,
+  addWishlistItem, toggleWishlistItem, deleteWishlistItem,
+  addNotepadItem, deleteNotepadItem,   // add these
+  filteredEntries, stats, avgFlavors,
+};
 })();

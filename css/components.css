@@ -574,7 +574,8 @@ textarea.form-input {
   font-style: italic;
   font-size: 15px;
   color: var(--ink);
-  line-height: 1.9;
+  line-height: 32px;
+  padding-top: 8px;
   resize: vertical;
   outline: none;
   transition: border-color var(--trans-fast);
