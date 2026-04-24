@@ -22,15 +22,28 @@ const State = (() => {
   };
 
   async function load() {
-   const { data: notepadRows } = await supabase
-  .from('notepad')
-  .select('*')
-  .order('updated_at', { ascending: false });
+    const user = await getCurrentUser();
+    if (!user) return;
 
-_state.notepadItems = (notepadRows || []).map(row => {
-  try { return { ...JSON.parse(row.content), _dbId: row.id }; }
-  catch { return null; }
-}).filter(Boolean);
+    const { data: entries }     = await supabase
+      .from('entries')
+      .select('*')
+      .order('date', { ascending: false });
+
+    const { data: wishlist }    = await supabase
+      .from('wishlist')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const { data: notepadRows } = await supabase
+      .from('notepad')
+      .select('*')
+      .limit(1);
+
+    _state.entries        = entries        || [];
+    _state.wishlistItems  = wishlist       || [];
+    _state.notepadContent = notepadRows?.[0]?.content || '';
+    _state.notepadId      = notepadRows?.[0]?.id      || null;
   }
 
   function get(key)        { return _state[key]; }
