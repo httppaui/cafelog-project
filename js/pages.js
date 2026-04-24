@@ -28,6 +28,7 @@ function renderPage(page) {
   }
 }
 
+/* ── Journal ── */
 function renderJournalPage(container) {
   const stats    = State.stats();
   const entries  = State.filteredEntries();
@@ -59,6 +60,7 @@ function renderJournalPage(container) {
     State.get('entries').length;
 }
 
+/* ── Calendar ── */
 function renderCalendarPage(container) {
   const month   = State.get('calendarMonth');
   const year    = State.get('calendarYear');
@@ -112,6 +114,7 @@ function renderCalendarPage(container) {
   });
 }
 
+/* ── Timeline ── */
 function renderTimelinePage(container) {
   const entries = State.get('entries');
   let html = `<div class="section-label">
@@ -161,6 +164,7 @@ function renderTimelinePage(container) {
   });
 }
 
+/* ── Mood & Coffee ── */
 function renderMoodPage(container) {
   const selectedMood = State.get('selectedMoodPage');
   let html = `
@@ -203,6 +207,7 @@ function renderMoodPage(container) {
   });
 }
 
+/* ── AI Picks ── */
 function renderAIPage(container) {
   const recs    = State.get('aiRecommendations');
   const loading = State.get('aiLoading');
@@ -260,6 +265,7 @@ function renderAIPage(container) {
   });
 }
 
+/* ── Sensory Map ── */
 function renderSensoryPage(container) {
   const entries    = State.get('entries').filter(
     (e) => e.flavors && Object.keys(e.flavors).length > 0);
@@ -268,7 +274,6 @@ function renderSensoryPage(container) {
     <div class="sensory-header-card">
       <div class="sensory-header-title">🎨 Sensory Memory Map</div>
       <div class="sensory-header-sub">
-        <strong style="color:var(--mocha)">Unique Feature:</strong>
         Your personalized flavor fingerprint — built from every entry you log.
       </div>
     </div>`;
@@ -301,6 +306,7 @@ function renderSensoryPage(container) {
   container.innerHTML = html;
 }
 
+/* ── Wishlist ── */
 function renderWishlistPage(container) {
   const items = State.get('wishlistItems');
   let html = `
@@ -353,53 +359,277 @@ function renderWishlistPage(container) {
   });
 }
 
+/* ── Notepad ── */
 function renderNotepadPage(container) {
-  const savedContent = State.get('notepadContent');
+  const items = State.get('notepadItems') || [];
+
   container.innerHTML = `
-    <div class="notepad-header">
-      <div class="section-label" style="margin-bottom:0">
-        Your personal coffee notepad 📝</div>
-      <span class="notepad-save-indicator" id="saveIndicator">✓ Saved</span>
+    <!-- Compose area -->
+    <div style="background:white;border-radius:var(--radius-xl);
+      border:1.5px solid var(--mist);overflow:hidden;
+      box-shadow:var(--shadow-sm);margin-bottom:28px;">
+
+      <!-- Title input -->
+      <input
+        id="notepadTitle"
+        type="text"
+        placeholder="Note title…"
+        maxlength="100"
+        style="width:100%;padding:18px 20px 0;border:none;outline:none;
+          font-family:'Playfair Display',serif;font-size:18px;
+          font-style:italic;color:var(--espresso);background:transparent;
+          display:block;box-sizing:border-box;"
+      />
+
+      <!-- Divider -->
+      <div style="height:1px;background:var(--mist);margin:12px 20px 0;"></div>
+
+      <!-- Body textarea -->
+      <textarea
+        class="notepad-area"
+        id="notepadTextarea"
+        placeholder="Start writing your note…"
+        style="border:none;border-radius:0;min-height:180px;
+          font-size:14px;padding:14px 20px;width:100%;box-sizing:border-box;"
+      ></textarea>
+
+      <!-- Footer -->
+      <div style="display:flex;justify-content:space-between;
+        align-items:center;padding:12px 20px;
+        border-top:1px solid var(--mist);background:var(--foam);
+        flex-wrap:wrap;gap:8px;">
+        <span style="font-size:12px;color:var(--latte);"
+          id="notepadWordCount">0 words</span>
+        <div style="display:flex;gap:8px;">
+          <button id="clearNotepad"
+            style="background:none;border:1.5px solid var(--mist);
+              border-radius:var(--radius-full);color:var(--bark);
+              padding:8px 16px;font-size:13px;font-weight:600;
+              cursor:pointer;transition:all 0.15s ease;">
+            Clear
+          </button>
+          <button id="saveNotepad"
+            style="background:var(--espresso);color:var(--foam);
+              border:none;border-radius:var(--radius-full);
+              padding:8px 20px;font-size:13px;font-weight:600;
+              cursor:pointer;transition:all 0.15s ease;">
+            Save Note ☕
+          </button>
+        </div>
+      </div>
     </div>
-    <p style="font-size:13px;color:var(--bark);margin-bottom:14px">
-      Jot down brewing ratios, café recommendations, coffee quotes —
-      anything you want to remember.
-    </p>
-    <textarea class="notepad-area" id="notepadTextarea"
-      placeholder="Start writing… your notes auto-save as you type ✨"
-      >${escapeHtml(savedContent)}</textarea>
-    <div style="display:flex;justify-content:space-between;
-      align-items:center;margin-top:10px">
-      <span style="font-size:12px;color:var(--latte)" id="notepadWordCount">
-        ${countWords(savedContent)} words</span>
-      <button class="new-entry-btn" id="clearNotepad"
-        style="background:var(--sage);padding:8px 18px;font-size:13px">
-        Clear
-      </button>
+
+    <!-- Saved notes section -->
+    <div id="savedNotesSection">
+      ${items.length ? `
+        <div style="display:flex;align-items:center;
+          justify-content:space-between;margin-bottom:16px;">
+          <div class="section-label" style="margin-bottom:0;">
+            Saved Notes
+            <span style="font-size:13px;font-style:normal;
+              font-family:'DM Sans',sans-serif;
+              color:var(--latte);margin-left:8px;">
+              ${items.length} note${items.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;" id="notesList">
+          ${items.map(item => renderNoteCard(item)).join('')}
+        </div>
+      ` : `
+        <div style="text-align:center;padding:40px 20px;">
+          <div style="font-size:40px;margin-bottom:10px;opacity:0.3;">📝</div>
+          <div style="font-size:14px;color:var(--latte);">
+            Your saved notes will appear here
+          </div>
+        </div>
+      `}
     </div>`;
+
   const textarea  = document.getElementById('notepadTextarea');
-  const indicator = document.getElementById('saveIndicator');
   const wordCount = document.getElementById('notepadWordCount');
-  const saveNote  = debounce(async (val) => {
-    await State.saveNotepad(val);
-    indicator.classList.add('visible');
-    setTimeout(() => indicator.classList.remove('visible'), 1800);
-  }, 800);
+
   textarea?.addEventListener('input', () => {
-    const val = textarea.value;
-    wordCount.textContent = `${countWords(val)} words`;
-    saveNote(val);
+    wordCount.textContent = `${countWords(textarea.value)} words`;
   });
+
+  document.getElementById('saveNotepad')?.addEventListener('click', async () => {
+    const title   = document.getElementById('notepadTitle')?.value.trim();
+    const content = textarea?.value.trim();
+    if (!content) { showToast('Write something before saving! ☕'); return; }
+
+    const btn = document.getElementById('saveNotepad');
+    btn.disabled    = true;
+    btn.textContent = 'Saving…';
+
+    const now     = new Date();
+    const dateStr = now.toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric',
+    });
+    const timeStr = now.toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit',
+    });
+
+    await State.addNotepadItem({
+      id:      generateId(),
+      title:   title || 'Untitled Note',
+      content,
+      date:    dateStr,
+      time:    timeStr,
+    });
+
+    document.getElementById('notepadTitle').value = '';
+    textarea.value = '';
+    wordCount.textContent = '0 words';
+    showToast('📝 Note saved!');
+    renderNotepadPage(container);
+  });
+
   document.getElementById('clearNotepad')?.addEventListener('click', () => {
-    if (confirm('Clear your notepad? This cannot be undone.')) {
+    const title   = document.getElementById('notepadTitle')?.value;
+    const content = textarea?.value;
+    if (!title && !content) return;
+    if (confirm('Clear the current draft?')) {
+      document.getElementById('notepadTitle').value = '';
       textarea.value = '';
-      State.saveNotepad('');
       wordCount.textContent = '0 words';
-      showToast('Notepad cleared');
     }
+  });
+
+  bindNoteCardListeners(container);
+}
+
+function renderNoteCard(item, editMode = false) {
+  if (editMode) {
+    return `
+      <div class="note-card" data-note-id="${item.id}"
+        style="background:white;border-radius:var(--radius-lg);
+          padding:22px 24px;border:1.5px solid var(--caramel);
+          box-shadow:var(--shadow-sm);">
+        <input class="note-edit-title" type="text"
+          value="${escapeHtml(item.title || '')}"
+          placeholder="Note title…" maxlength="100"
+          style="width:100%;border:none;outline:none;
+            font-family:'Playfair Display',serif;font-size:17px;
+            font-style:italic;color:var(--espresso);background:transparent;
+            margin-bottom:10px;font-weight:700;display:block;
+            box-sizing:border-box;" />
+        <div style="height:1px;background:var(--mist);margin-bottom:12px;"></div>
+        <textarea class="note-edit-body notepad-area"
+          style="min-height:140px;border:none;border-radius:0;
+            font-size:14px;padding:0;background:transparent;
+            width:100%;box-sizing:border-box;"
+        >${escapeHtml(item.content)}</textarea>
+        <div style="display:flex;gap:8px;margin-top:14px;
+          justify-content:flex-end;padding-top:12px;
+          border-top:1px solid var(--mist);">
+          <button class="note-cancel-edit" data-note-id="${item.id}"
+            style="background:none;border:1.5px solid var(--mist);
+              border-radius:var(--radius-full);color:var(--bark);
+              padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;">
+            Cancel
+          </button>
+          <button class="note-save-edit" data-note-id="${item.id}"
+            style="background:var(--espresso);color:var(--foam);border:none;
+              border-radius:var(--radius-full);padding:7px 18px;
+              font-size:13px;font-weight:600;cursor:pointer;">
+            Save Changes
+          </button>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="note-card" data-note-id="${item.id}"
+      style="background:white;border-radius:var(--radius-lg);
+        padding:22px 24px;border:1px solid var(--mist);
+        transition:box-shadow 0.2s ease;">
+      <div style="display:flex;align-items:flex-start;
+        justify-content:space-between;gap:12px;margin-bottom:10px;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:17px;
+            font-style:italic;color:var(--espresso);font-weight:700;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${escapeHtml(item.title || 'Untitled Note')}
+          </div>
+          <div style="font-size:11px;color:var(--latte);margin-top:3px;
+            text-transform:uppercase;letter-spacing:0.5px;">
+            ${item.date}${item.time ? ' · ' + item.time : ''}
+            · ${countWords(item.content)} words
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button data-edit-note="${item.id}"
+            style="background:var(--foam);border:1px solid var(--mist);
+              border-radius:var(--radius-full);color:var(--bark);
+              font-size:12px;padding:5px 12px;cursor:pointer;
+              font-weight:600;white-space:nowrap;transition:all 0.15s ease;">
+            ✏️ Edit
+          </button>
+          <button data-delete-note="${item.id}"
+            style="background:none;border:1px solid var(--mist);
+              border-radius:var(--radius-full);color:var(--latte);
+              font-size:12px;padding:5px 12px;cursor:pointer;
+              font-weight:600;transition:all 0.15s ease;">
+            🗑 Delete
+          </button>
+        </div>
+      </div>
+      <p style="font-family:'Be Vietnam Pro',sans-serif;font-style:italic;
+        font-size:14px;color:var(--ink);line-height:1.8;
+        white-space:pre-wrap;margin:0;
+        display:-webkit-box;-webkit-line-clamp:3;
+        -webkit-box-orient:vertical;overflow:hidden;">
+        ${escapeHtml(item.content)}
+      </p>
+    </div>`;
+}
+
+function bindNoteCardListeners(container) {
+  container.querySelectorAll('[data-edit-note]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id   = parseInt(btn.dataset.editNote);
+      const item = (State.get('notepadItems') || []).find(n => n.id === id);
+      if (!item) return;
+      const card = container.querySelector(`.note-card[data-note-id="${id}"]`);
+      if (card) {
+        card.insertAdjacentHTML('afterend', renderNoteCard(item, true));
+        card.remove();
+        bindNoteCardListeners(container);
+      }
+    });
+  });
+
+  container.querySelectorAll('.note-save-edit').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id      = parseInt(btn.dataset.noteId);
+      const card    = container.querySelector(`.note-card[data-note-id="${id}"]`);
+      const title   = card?.querySelector('.note-edit-title')?.value.trim();
+      const content = card?.querySelector('.note-edit-body')?.value.trim();
+      if (!content) { showToast('Note cannot be empty!'); return; }
+      btn.disabled    = true;
+      btn.textContent = 'Saving…';
+      await State.updateNotepadItem(id, { title: title || 'Untitled Note', content });
+      showToast('📝 Note updated!');
+      renderNotepadPage(container);
+    });
+  });
+
+  container.querySelectorAll('.note-cancel-edit').forEach(btn => {
+    btn.addEventListener('click', () => renderNotepadPage(container));
+  });
+
+  container.querySelectorAll('[data-delete-note]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this note? This cannot be undone.')) return;
+      await State.deleteNotepadItem(parseInt(btn.dataset.deleteNote));
+      showToast('Note deleted.');
+      renderNotepadPage(container);
+    });
   });
 }
 
+/* ── Helpers ── */
 function countWords(text) {
   if (!text || !text.trim()) return 0;
   return text.trim().split(/\s+/).length;
