@@ -209,9 +209,15 @@ function initAuthListeners() {
   });
 
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await signOut();
-    showToast('You have been signed out.');
-  });
+  try {
+    clearInactivityTimer();
+    await supabase.auth.signOut();
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('appWrapper').style.display = 'none';
+  } catch(err) {
+    console.error(err);
+  }
+});
 
   initInactivityTracking();
 }
