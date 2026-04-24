@@ -17,7 +17,7 @@ async function signIn(email, password) {
 async function signInWithGitHub() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
-    options: { redirectTo: window.location.origin },
+    options: { redirectTo: 'https://cafelog-project.vercel.app' },
   });
   if (error) {
     showToast('Could not connect to GitHub. Please try again.');
