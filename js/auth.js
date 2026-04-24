@@ -106,7 +106,6 @@ function initInactivityTracking() {
 }
 
 function initAuthListeners() {
-  attachCSRFTokens();
 
   document.getElementById('showSignup')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -129,12 +128,7 @@ function initAuthListeners() {
 
   document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const csrfInput = e.target.querySelector('[name="csrf_token"]');
-    if (!validateCSRFToken(csrfInput?.value)) {
-      document.getElementById('loginError').textContent =
-        'Security validation failed. Please refresh the page.';
-      return;
-    }
+    
     const email    = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const errorEl  = document.getElementById('loginError');
@@ -153,12 +147,7 @@ function initAuthListeners() {
 
   document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const csrfInput = e.target.querySelector('[name="csrf_token"]');
-    if (!validateCSRFToken(csrfInput?.value)) {
-      document.getElementById('signupError').textContent =
-        'Security validation failed. Please refresh the page.';
-      return;
-    }
+   
     const email    = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirm  = document.getElementById('signupConfirm').value;
