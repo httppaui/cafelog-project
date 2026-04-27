@@ -1,4 +1,4 @@
-// auth.js — handles login, signup, logout, and GitHub OAuth
+// auth.js — handles login, signup, and logout
 
 async function signUp(email, password) {
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -12,17 +12,6 @@ async function signIn(email, password) {
   });
   if (error) throw error;
   return data;
-}
-
-async function signInWithGitHub() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'github',
-    options: { redirectTo: 'https://cafelog-project.vercel.app' },
-  });
-  if (error) {
-    showToast('Could not connect to GitHub. Please try again.');
-    console.error(error);
-  }
 }
 
 async function signOut() {
@@ -121,14 +110,8 @@ function initAuthListeners() {
     attachCSRFTokens();
   });
 
-  document.getElementById('githubLoginBtn')
-    ?.addEventListener('click', signInWithGitHub);
-  document.getElementById('githubSignupBtn')
-    ?.addEventListener('click', signInWithGitHub);
-
   document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     const email    = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const errorEl  = document.getElementById('loginError');
@@ -147,7 +130,6 @@ function initAuthListeners() {
 
   document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-   
     const email    = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirm  = document.getElementById('signupConfirm').value;
@@ -198,15 +180,15 @@ function initAuthListeners() {
   });
 
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-  try {
-    clearInactivityTimer();
-    await supabase.auth.signOut();
-    document.getElementById('authScreen').style.display = 'flex';
-    document.getElementById('appWrapper').style.display = 'none';
-  } catch(err) {
-    console.error(err);
-  }
-});
+    try {
+      clearInactivityTimer();
+      await supabase.auth.signOut();
+      document.getElementById('authScreen').style.display = 'flex';
+      document.getElementById('appWrapper').style.display = 'none';
+    } catch(err) {
+      console.error(err);
+    }
+  });
 
   initInactivityTracking();
 }
