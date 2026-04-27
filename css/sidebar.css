@@ -1,0 +1,152 @@
+/* sidebar.css — collapsible sidebar with Bootstrap Icons */
+
+/* ── Collapse Button (next to logo) ── */
+#collapseBtn {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: rgba(253,246,236,0.35);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.25s ease;
+}
+
+#collapseBtn:hover {
+  color: rgba(253,246,236,0.8);
+  background: rgba(255,255,255,0.08);
+}
+
+/* ── Nav Icon Base ── */
+.nav-icon {
+  font-size: 15px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Sidebar & Main smooth transition ── */
+.sidebar {
+  transition: width 0.25s ease, transform var(--trans-normal);
+}
+
+.main {
+  transition: margin-left 0.25s ease, width 0.25s ease;
+}
+
+/* ── Collapsed State ── */
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .nav-section-label,
+.sidebar.collapsed .sidebar-logo img,
+.sidebar.collapsed .streak-label,
+.sidebar.collapsed .streak-sub,
+.sidebar.collapsed .streak-number {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-inner {
+  align-items: center;
+  padding: 14px 8px;
+  gap: 2px;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  width: 100%;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+  width: 40px;
+  border-radius: 10px;
+  position: relative;
+}
+
+/* Tooltip on hover when collapsed */
+.sidebar.collapsed .nav-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--espresso);
+  color: var(--foam);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 999;
+}
+
+.sidebar.collapsed .nav-item:hover::after {
+  opacity: 1;
+}
+
+.sidebar.collapsed .nav-icon {
+  width: auto;
+  font-size: 18px;
+  margin: 0;
+}
+
+.sidebar.collapsed .sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: auto;
+}
+
+.sidebar.collapsed #accountBtn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 10px;
+  margin-top: 0;
+}
+
+.sidebar.collapsed #logoutBtn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+/* ── Main shifts when sidebar collapses ── */
+.main.sidebar-collapsed {
+  margin-left: 60px;
+  width: calc(100% - 60px);
+}
+
+/* ── Hide collapse button on mobile ── */
+@media (max-width: 768px) {
+  #collapseBtn { display: none; }
+  .main.sidebar-collapsed {
+    margin-left: 0;
+    width: 100%;
+  }
+}

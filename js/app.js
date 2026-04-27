@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       initSearch();
       initHamburger();
       initViewToggle();
+      initCollapsibleSidebar();
+      initAccountListeners();
     } else if (event === 'SIGNED_OUT') {
       showAuthScreen();
     }
@@ -29,6 +31,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSearch();
     initHamburger();
     initViewToggle();
+    initCollapsibleSidebar();
+    initAccountListeners();
   }
 });
 
@@ -37,7 +41,9 @@ function initNav() {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       navigateTo(link.dataset.page);
-      document.getElementById('sidebar')?.classList.remove('open');
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar')?.classList.remove('open');
+      }
     });
   });
 }
@@ -52,7 +58,7 @@ function navigateTo(page) {
     calendar: 'Calendar',
     timeline: 'Timeline',
     mood:     'Mood & Coffee',
-    ai:       'AI Picks',
+    ai:       'Recommendations',
     sensory:  'Sensory Map',
     wishlist: 'Café Wishlist',
     notepad:  'My Notepad',
@@ -94,6 +100,28 @@ function initViewToggle() {
       b.classList.toggle('active', b.dataset.view === view)
     );
     renderPage(State.get('currentPage'));
+  });
+}
+
+function initCollapsibleSidebar() {
+  const collapseBtn = document.getElementById('collapseBtn');
+  const sidebar     = document.getElementById('sidebar');
+  const main        = document.getElementById('mainContent');
+
+  if (!collapseBtn || !sidebar || !main) return;
+
+  const isCollapsed = localStorage.getItem('cafelog_sidebar_collapsed') === 'true';
+  if (isCollapsed) {
+    sidebar.classList.add('collapsed');
+    main.classList.add('sidebar-collapsed');
+    collapseBtn.style.transform = 'rotate(180deg)';
+  }
+
+  collapseBtn.addEventListener('click', () => {
+    const collapsed = sidebar.classList.toggle('collapsed');
+    main.classList.toggle('sidebar-collapsed', collapsed);
+    collapseBtn.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+    localStorage.setItem('cafelog_sidebar_collapsed', collapsed);
   });
 }
 
